@@ -16,11 +16,23 @@ function App() {
           <div className="ambient-blob blob-1" aria-hidden="true" />
           <div className="ambient-blob blob-2" aria-hidden="true" />
           <div className="ambient-blob blob-3" aria-hidden="true" />
+
           <AppNavbar />
+
           <Routes>
             <Route path="/" element={<Dashboard />} />
+
             <Route path="/add" element={<AddTransaction />} />
-            <Route path="/transaction/:id" element={<TransactionDetail />} />
+
+            {/* Main Transaction Details page */}
+            <Route path="/transaction" element={<TransactionDetail />} />
+
+            {/* Individual Transaction Details page */}
+            <Route
+              path="/transaction/:id"
+              element={<TransactionDetail />}
+            />
+
             <Route path="/summary" element={<Summary />} />
           </Routes>
         </div>
@@ -30,4 +42,3 @@ function App() {
 }
 
 export default App;
-
