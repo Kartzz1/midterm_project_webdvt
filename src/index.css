@@ -1,0 +1,739 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+
+:root,
+[data-theme="light"] {
+  --bg-gradient: radial-gradient(circle at 15% 10%, #dbeafe 0%, transparent 45%),
+    radial-gradient(circle at 85% 0%, #ede9fe 0%, transparent 40%),
+    radial-gradient(circle at 50% 100%, #d1fae5 0%, transparent 45%),
+    #f4f6fb;
+  --text-primary: #1a1d29;
+  --text-secondary: #565b6e;
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-bg-strong: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --glass-shadow: 0 24px 48px -18px rgba(31, 38, 135, 0.28), 0 2px 8px rgba(31, 38, 135, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75), inset 0 -1px 0 rgba(31, 38, 135, 0.05);
+  --glass-sheen: rgba(255, 255, 255, 0.55);
+  --glass-highlight: linear-gradient(155deg, var(--glass-sheen), rgba(255, 255, 255, 0) 45%);
+  --accent: #6366f1;
+  --accent-2: #8b5cf6;
+  --income: #10b981;
+  --expense: #ef4444;
+  --navbar-bg: rgba(255, 255, 255, 0.65);
+  --input-bg: rgba(255, 255, 255, 0.6);
+  --input-border: rgba(26, 29, 41, 0.12);
+  --icon-tile-bg: rgba(26, 29, 41, 0.05);
+  --select-solid-bg: #ffffff;
+  --select-scheme: light;
+  --flow-color-1: #6366f1;
+  --flow-color-2: #14b8a6;
+  --flow-color-3: #8b5cf6;
+}  
+
+[data-theme="dark"] {
+  --bg-gradient: radial-gradient(circle at 20% -10%, rgba(37, 99, 235, 0.28) 0%, transparent 45%),
+    radial-gradient(circle at 90% 10%, rgba(20, 184, 166, 0.16) 0%, transparent 42%),
+    radial-gradient(circle at 50% 110%, rgba(99, 102, 241, 0.14) 0%, transparent 50%),
+    linear-gradient(160deg, #060810 0%, #0a0e1a 45%, #070a13 100%);
+  --text-primary: #eef0f8;
+  --text-secondary: #a3a8c3;
+  --glass-bg: rgba(30, 33, 54, 0.5);
+  --glass-bg-strong: rgba(24, 26, 44, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 24px 48px -18px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+  --glass-sheen: rgba(255, 255, 255, 0.06);
+  --glass-highlight: linear-gradient(155deg, var(--glass-sheen), rgba(255, 255, 255, 0) 45%);
+  --accent: #6d7bf7;
+  --accent-2: #4f9cf9;
+  --income: #34d399;
+  --expense: #f87171;
+  --navbar-bg: rgba(10, 12, 22, 0.65);
+  --input-bg: rgba(255, 255, 255, 0.06);
+  --input-border: rgba(255, 255, 255, 0.14);
+  --icon-tile-bg: rgba(255, 255, 255, 0.06);
+  --select-solid-bg: #171a2c;
+  --select-scheme: dark;
+  --flow-color-1: #2563eb;
+  --flow-color-2: #14b8a6;
+  --flow-color-3: #6d7bf7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100vh;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  transition: background 0.4s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+a {
+  color: var(--accent);
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+.page-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.glass-card-lg {
+  padding: 2.25rem;
+}
+
+@media (max-width: 576px) {
+  .glass-card-lg {
+    padding: 1.5rem;
+  }
+}
+
+/* ---------- Liquid Glass core (3D glassmorphism) ---------- */
+.glass {
+  position: relative;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: var(--glass-shadow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.3s ease;
+  isolation: isolate;
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--glass-highlight);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.glass-strong {
+  position: relative;
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  box-shadow: var(--glass-shadow);
+  isolation: isolate;
+}
+
+.glass-strong::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--glass-highlight);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.glass-card {
+  padding: 1.5rem;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+}
+
+.glass-panel-sm {
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+}
+
+.ambient-blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(70px);
+  z-index: -2;
+  opacity: 0.55;
+  pointer-events: none;
+  animation: drift-blob 22s ease-in-out infinite alternate;
+}
+
+.blob-1 {
+  width: 380px;
+  height: 380px;
+  background: var(--flow-color-1);
+  top: -100px;
+  left: -100px;
+  opacity: 0.3;
+  animation-duration: 24s;
+}
+
+.blob-2 {
+  width: 440px;
+  height: 440px;
+  background: var(--flow-color-3);
+  bottom: -140px;
+  right: -120px;
+  opacity: 0.24;
+  animation-duration: 28s;
+  animation-direction: alternate-reverse;
+}
+
+.blob-3 {
+  width: 360px;
+  height: 360px;
+  background: var(--flow-color-2);
+  top: 38%;
+  left: 55%;
+  opacity: 0.18;
+  animation-duration: 32s;
+}
+
+@keyframes drift-blob {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(50px, 35px) scale(1.1);
+  }
+  100% {
+    transform: translate(-35px, -25px) scale(0.94);
+  }
+}
+
+/* Liquid "glass flow" background — a slowly rotating conic wash plus a
+   drifting aurora gradient, both built from pure color (no geometric
+   texture/pattern), so the whole page reads as gently moving light
+   behind frosted glass rather than a static or busy backdrop. */
+.bg-flow {
+  position: fixed;
+  inset: -20%;
+  z-index: -5;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg at 30% 20%,
+    var(--flow-color-1) 0deg,
+    transparent 90deg,
+    var(--flow-color-2) 170deg,
+    transparent 250deg,
+    var(--flow-color-3) 310deg,
+    var(--flow-color-1) 360deg
+  );
+  opacity: 0.12;
+  filter: blur(100px);
+  animation: flow-rotate 75s linear infinite;
+}
+
+.bg-flow-aurora {
+  position: fixed;
+  inset: -20%;
+  z-index: -6;
+  pointer-events: none;
+  background: linear-gradient(
+    120deg,
+    var(--flow-color-1) 0%,
+    transparent 32%,
+    var(--flow-color-2) 55%,
+    transparent 76%,
+    var(--flow-color-3) 100%
+  );
+  background-size: 240% 240%;
+  opacity: 0.16;
+  filter: blur(110px);
+  animation: aurora-drift 26s ease-in-out infinite;
+}
+
+@keyframes flow-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes aurora-drift {
+  0% {
+    background-position: 0% 20%;
+  }
+  50% {
+    background-position: 100% 80%;
+  }
+  100% {
+    background-position: 0% 20%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-blob,
+  .bg-flow,
+  .bg-flow-aurora {
+    animation: none;
+  }
+}
+
+/* ---------- Navbar ---------- */
+.glass-navbar {
+  background: var(--navbar-bg) !important;
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 0.75rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+}
+
+.glass-navbar .navbar-brand {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary) !important;
+}
+
+.glass-navbar .nav-link {
+  color: var(--text-secondary) !important;
+  font-weight: 500;
+  border-radius: 10px;
+  padding: 0.5rem 0.9rem !important;
+  margin: 0 0.15rem;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.glass-navbar .nav-link:hover {
+  color: var(--text-primary) !important;
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.glass-navbar .nav-link.active {
+  color: #fff !important;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+}
+
+/* ---------- Typography helpers ---------- */
+.text-secondary-soft {
+  color: var(--text-secondary) !important;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Buttons (3D glassmorphism) ---------- */
+.btn-glass-primary {
+  position: relative;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 0.55rem 1.2rem;
+  box-shadow: 0 10px 24px -6px rgba(99, 102, 241, 0.5), 0 2px 6px rgba(99, 102, 241, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -2px 4px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-glass-primary:hover,
+.btn-glass-primary:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px -6px rgba(99, 102, 241, 0.55), 0 4px 10px rgba(99, 102, 241, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -2px 4px rgba(0, 0, 0, 0.12);
+  color: #fff;
+}
+
+.btn-glass-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px -4px rgba(99, 102, 241, 0.5), inset 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.btn-glass-primary:disabled {
+  opacity: 0.55;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-glass-primary-lg {
+  padding: 0.85rem 1.75rem;
+  font-size: 1.05rem;
+  border-radius: 14px;
+}
+
+.btn-glass-outline {
+  background: var(--glass-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text-primary);
+  font-weight: 500;
+  border-radius: 12px;
+  padding: 0.55rem 1.1rem;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.btn-glass-outline:hover {
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -6px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-glass-outline:active {
+  transform: translateY(0);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.btn-glass-danger {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--expense);
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 0.55rem 1.1rem;
+  box-shadow: 0 6px 16px -6px rgba(239, 68, 68, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.btn-glass-danger:hover {
+  background: rgba(239, 68, 68, 0.22);
+  color: var(--expense);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -6px rgba(239, 68, 68, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.btn-glass-danger:active {
+  transform: translateY(0);
+}
+
+.btn-icon-only {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 10px;
+}
+
+/* ---------- Forms ---------- */
+.glass-input,
+.form-select.glass-input,
+textarea.glass-input {
+  background: var(--input-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  color: var(--text-primary) !important;
+  border-radius: 12px !important;
+  padding: 0.6rem 0.9rem !important;
+}
+
+.glass-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.glass-input:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18) !important;
+  background: var(--input-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+.glass-input-lg {
+  padding: 0.85rem 1.1rem !important;
+  font-size: 1.02rem !important;
+  border-radius: 14px !important;
+}
+
+/* Native <select> dropdown popups are rendered by the OS/browser and
+   ignore our translucent glass background, which made dark-mode options
+   unreadable (dark text on a dark popup, or vice versa). Forcing
+   color-scheme plus an explicit solid background/color on <option>
+   guarantees the popup list is always legible in both themes. */
+select.glass-input {
+  color-scheme: var(--select-scheme);
+}
+
+select.glass-input option {
+  background-color: var(--select-solid-bg);
+  color: var(--text-primary);
+}
+
+/* Custom glass dropdown (replaces native <select> for the Dashboard
+   filters) — fully theme-styled and always opens downward, since the
+   native OS popup ignored our styling and could flip open upward when
+   close to the bottom of the viewport. */
+.glass-select-toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.glass-select-toggle:focus {
+  outline: none;
+}
+
+.glass-dropdown-menu {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(22px) saturate(170%);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 0.4rem;
+  box-shadow: var(--glass-shadow);
+  min-width: 180px;
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 2000 !important;
+}
+
+.glass-dropdown-menu .dropdown-item {
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.92rem;
+  transition: background 0.15s ease;
+}
+
+.glass-dropdown-menu .dropdown-item:hover,
+.glass-dropdown-menu .dropdown-item:focus {
+  background: rgba(99, 102, 241, 0.14);
+  color: var(--text-primary);
+}
+
+.glass-dropdown-menu .dropdown-item.active,
+.glass-dropdown-menu .dropdown-item:active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+}
+
+/* Search input with a leading icon: enough left padding so typed text
+   never sits under the icon, and the icon itself is decorative/inert
+   so it never intercepts clicks or the text caret. */
+.search-input-wrap {
+  position: relative;
+}
+
+.search-input-wrap .search-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.search-input-wrap input.glass-input {
+  padding-left: 2.6rem !important;
+}
+
+.form-label {
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.88rem;
+  margin-bottom: 0.35rem;
+}
+
+.invalid-feedback-glass {
+  color: var(--expense);
+  font-size: 0.82rem;
+  margin-top: 0.3rem;
+}
+
+/* ---------- Badges / chips ---------- */
+.type-badge-income {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--income);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.type-badge-expense {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--expense);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.category-chip {
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---------- Balance amounts ---------- */
+.amount-income {
+  color: var(--income);
+  font-weight: 700;
+}
+
+.amount-expense {
+  color: var(--expense);
+  font-weight: 700;
+}
+
+/* ---------- Progress bars (Summary) ---------- */
+.category-progress {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(127, 127, 127, 0.18);
+  overflow: hidden;
+}
+
+.category-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  transition: width 0.6s ease;
+}
+
+/* ---------- Modal ---------- */
+.glass-modal .modal-content {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  color: var(--text-primary);
+}
+
+.glass-modal .modal-header,
+.glass-modal .modal-footer {
+  border-color: var(--glass-border);
+}
+
+/* ---------- Hero / page headers ---------- */
+.page-eyebrow {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.page-hero-title {
+  font-size: clamp(1.9rem, 4vw, 2.9rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.page-hero-subtitle {
+  color: var(--text-secondary);
+  font-size: 1.02rem;
+  margin-bottom: 0;
+}
+
+.icon-tile {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--icon-tile-bg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 10px -4px rgba(0, 0, 0, 0.25);
+}
+
+.icon-tile-income {
+  background: rgba(16, 185, 129, 0.16);
+  color: var(--income);
+}
+
+.icon-tile-expense {
+  background: rgba(239, 68, 68, 0.16);
+  color: var(--expense);
+}
+
+.icon-tile-accent {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+  color: var(--accent);
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.appearance-pill {
+  padding: 0.4rem 0.5rem 0.4rem 0.9rem;
+}
+
+/* ---------- Empty state ---------- */
+.empty-state {
+  text-align: center;
+  padding: 3.5rem 1.5rem;
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  color: var(--accent);
+  opacity: 0.6;
+  margin-bottom: 1rem;
+}
+
+/* ---------- Misc ---------- */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px);
+}
+
+.divider-soft {
+  border-color: var(--glass-border);
+  opacity: 1;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(127, 127, 127, 0.3);
+  border-radius: 999px;
+}
+
+@media (max-width: 576px) {
+  .page-container {
+    padding: 1rem 0.75rem 2.5rem;
+  }
+
+  .glass-card {
+    padding: 1.1rem;
+  }
+}
