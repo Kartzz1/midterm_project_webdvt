@@ -5,56 +5,75 @@ import { formatCurrency } from "../utils/currency";
 import { formatDate } from "../utils/date";
 import { getCategoryIcon } from "../utils/categoryIcons";
 
-/**
- * Displays a single transaction. Memoized with React.memo (see
- * TransactionList) so that re-filtering the list doesn't force every
- * unchanged card to re-render — only cards whose props actually
- * changed do.
- */
 function TransactionCard({ transaction }) {
-  const isIncome = transaction.type === "income";
-  const CategoryIcon = getCategoryIcon(transaction.category);
+  const { id, type, description, category, amount, date } = transaction;
+  const isIncome = type === "income";
+  const CategoryIcon = getCategoryIcon(category);
 
+  const amountClass = isIncome
+    ? "amount-income"
+    : "amount-expense";
+
+  const iconStyle = {
+    width: 44,
+    height: 44,
+    background: isIncome
+      ? "rgba(16, 185, 129, 0.15)"
+      : "rgba(239, 68, 68, 0.15)",
+  };
+
+  // Keep the transaction card focused on displaying the provided data.
   return (
     <Link
-      to={`/transaction/${transaction.id}`}
+      to={`/transaction/${id}`}
       className="text-decoration-none"
     >
       <div className="glass glass-panel-sm mb-3 hover-lift d-flex align-items-center justify-content-between flex-wrap gap-2">
         <div className="d-flex align-items-center gap-3 flex-grow-1 min-width-0">
           <div
             className="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
-            style={{
-              width: 44,
-              height: 44,
-              background: isIncome
-                ? "rgba(16,185,129,0.15)"
-                : "rgba(239,68,68,0.15)",
-            }}
+            style={iconStyle}
           >
             <CategoryIcon
               size={20}
-              color={isIncome ? "var(--income)" : "var(--expense)"}
+              color={
+                isIncome
+                  ? "var(--income)"
+                  : "var(--expense)"
+              }
             />
           </div>
+
           <div className="min-width-0">
-            <div className="fw-semibold text-truncate" style={{ color: "var(--text-primary)" }}>
-              {transaction.description}
+            <div
+              className="fw-semibold text-truncate"
+              style={{ color: "var(--text-primary)" }}
+            >
+              {description}
             </div>
+
             <div className="d-flex align-items-center gap-2 flex-wrap mt-1">
-              <span className="category-chip">{transaction.category}</span>
+              <span className="category-chip">
+                {category}
+              </span>
+
               <span className="small text-secondary-soft">
-                {formatDate(transaction.date)}
+                {formatDate(date)}
               </span>
             </div>
           </div>
         </div>
+
         <div className="d-flex align-items-center gap-3">
-          <span className={isIncome ? "amount-income" : "amount-expense"}>
+          <span className={amountClass}>
             {isIncome ? "+" : "-"}
-            {formatCurrency(transaction.amount)}
+            {formatCurrency(amount)}
           </span>
-          <PiCaretRightBold className="text-secondary-soft" />
+
+          <PiCaretRightBold
+            className="text-secondary-soft"
+            aria-hidden="true"
+          />
         </div>
       </div>
     </Link>
