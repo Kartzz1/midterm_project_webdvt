@@ -49,10 +49,10 @@ function Dashboard() {
         <div>
           <span className="page-eyebrow">Personal Finance</span>
           <h1 className="page-hero-title">
-            Your money, <span className="gradient-text">simplified.</span>
+            Spend smarter. <span className="gradient-text">Live better.</span>
           </h1>
           <p className="page-hero-subtitle">
-            Track your income and expenses without the complexity.
+            Keep your income and expenses organized in one simple place.
           </p>
         </div>
         <Link
