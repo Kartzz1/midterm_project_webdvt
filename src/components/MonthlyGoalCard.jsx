@@ -2,23 +2,37 @@ import { useState } from "react";
 import { PiTargetBold } from "react-icons/pi";
 import { formatCurrency } from "../utils/currency";
 
-/**
- * Lets the user set a monthly spending limit and see how current total
- * expenses compare to it. `goal` and `onUpdateGoal` come from
- * useMonthlyGoal (via the Summary page); `totalExpenses` comes from the
- * already-computed expense breakdown so this component doesn't need to
- * touch transactions directly.
- */
 function MonthlyGoalCard({ goal, totalExpenses, onUpdateGoal }) {
   const [inputValue, setInputValue] = useState(goal);
 
-  const percentUsed = goal > 0 ? Math.min((totalExpenses / goal) * 100, 100) : 0;
+  // Calculate how much of the monthly limit has already been used.
+  const percentUsed =
+    goal > 0 ? Math.min((totalExpenses / goal) * 100, 100) : 0;
+
   const isOverBudget = totalExpenses > goal;
   const remaining = goal - totalExpenses;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onUpdateGoal(inputValue);
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    // Convert the input value to a number before saving the new goal.
+    const newGoal = Number(inputValue);
+
+    if (newGoal > 0) {
+      onUpdateGoal(newGoal);
+    }
+  };
+
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  };
+
+  const progressStyle = {
+    width: `${percentUsed}%`,
+    ...(isOverBudget && {
+      background:
+        "linear-gradient(135deg, var(--expense), #f59e0b)",
+    }),
   };
 
   return (
@@ -27,6 +41,7 @@ function MonthlyGoalCard({ goal, totalExpenses, onUpdateGoal }) {
         <div className="icon-tile icon-tile-accent">
           <PiTargetBold size={22} />
         </div>
+
         <div>
           <h5 className="mb-1">Monthly Goal</h5>
           <p className="text-secondary-soft small mb-0">
@@ -39,6 +54,7 @@ function MonthlyGoalCard({ goal, totalExpenses, onUpdateGoal }) {
         <label htmlFor="spending-limit" className="form-label">
           Spending limit
         </label>
+
         <input
           id="spending-limit"
           type="number"
@@ -46,9 +62,13 @@ function MonthlyGoalCard({ goal, totalExpenses, onUpdateGoal }) {
           step="0.01"
           className="form-control glass-input mb-3"
           value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={handleInputChange}
         />
-        <button type="submit" className="btn-glass-primary btn w-100">
+
+        <button
+          type="submit"
+          className="btn-glass-primary btn w-100"
+        >
           Update Goal
         </button>
       </form>
@@ -56,8 +76,18 @@ function MonthlyGoalCard({ goal, totalExpenses, onUpdateGoal }) {
       <hr className="divider-soft my-4" />
 
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <span className="text-secondary-soft small fw-semibold">Spent</span>
-        <span className={isOverBudget ? "amount-expense" : "fw-bold"} style={!isOverBudget ? { color: "var(--text-primary)" } : undefined}>
+        <span className="text-secondary-soft small fw-semibold">
+          Spent
+        </span>
+
+        <span
+          className={isOverBudget ? "amount-expense" : "fw-bold"}
+          style={
+            !isOverBudget
+              ? { color: "var(--text-primary)" }
+              : undefined
+          }
+        >
           {formatCurrency(totalExpenses)}
         </span>
       </div>
@@ -65,16 +95,14 @@ function MonthlyGoalCard({ goal, totalExpenses, onUpdateGoal }) {
       <div className="category-progress mb-2">
         <div
           className="category-progress-fill"
-          style={{
-            width: `${percentUsed}%`,
-            background: isOverBudget
-              ? "linear-gradient(135deg, var(--expense), #f59e0b)"
-              : undefined,
-          }}
+          style={progressStyle}
         />
       </div>
+
       <span
-        className={`small fw-semibold ${isOverBudget ? "amount-expense" : "amount-income"}`}
+        className={`small fw-semibold ${
+          isOverBudget ? "amount-expense" : "amount-income"
+        }`}
       >
         {isOverBudget
           ? `${formatCurrency(Math.abs(remaining))} over budget`
