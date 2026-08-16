@@ -322,6 +322,35 @@ a {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
 }
 
+/* Keep the responsive menu smooth when opening and closing. */
+@media (max-width: 991.98px) {
+  .glass-navbar .navbar-collapse {
+    transition:
+      height 0.35s ease,
+      opacity 0.25s ease;
+  }
+
+  .glass-navbar .navbar-collapse.collapsing {
+    opacity: 0;
+  }
+
+  .glass-navbar .navbar-collapse.show {
+    opacity: 1;
+  }
+
+  .glass-navbar .navbar-nav {
+    transition: transform 0.35s ease;
+  }
+
+  .glass-navbar .navbar-collapse.collapsing .navbar-nav {
+    transform: translateY(-6px);
+  }
+
+  .glass-navbar .navbar-collapse.show .navbar-nav {
+    transform: translateY(0);
+  }
+}
+
 /* ---------- Typography helpers ---------- */
 .text-secondary-soft {
   color: var(--text-secondary) !important;
