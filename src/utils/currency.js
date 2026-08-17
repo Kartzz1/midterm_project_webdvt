@@ -1,10 +1,4 @@
-/**
- * Centralized currency formatting utility for Philippine Peso.
- * Keeping this in one place means every page/component formats
- * money the exact same way, and we only fix it in one spot if
- * requirements change.
- */
-const formatter = new Intl.NumberFormat("en-PH", {
+const CURRENCY_FORMATTER = new Intl.NumberFormat("en-PH", {
   style: "currency",
   currency: "PHP",
   currencyDisplay: "symbol",
@@ -12,18 +6,19 @@ const formatter = new Intl.NumberFormat("en-PH", {
   maximumFractionDigits: 2,
 });
 
-/**
- * Formats a number into a Philippine Peso string, e.g. ₱1,500.00
- * Falls back gracefully for invalid/undefined input.
- */
+const PESO_SYMBOL = "₱";
+
 export function formatCurrency(amount) {
   const value = Number(amount);
-  if (Number.isNaN(value)) return "₱0.00";
 
-  // Intl gives us "PHP1,500.00" in some environments instead of "₱1,500.00"
-  // so we normalize it to guarantee the peso glyph is used.
-  const formatted = formatter.format(value);
-  return formatted.replace(/^PHP/, "₱").replace(/^\s*PHP\s*/, "₱");
+  if (!Number.isFinite(value)) {
+    return `${PESO_SYMBOL}0.00`;
+  }
+
+  const formatted = CURRENCY_FORMATTER.format(value);
+
+  // Some environments may return "PHP" instead of the peso symbol.
+  return formatted.replace(/^PHP\s?/, PESO_SYMBOL);
 }
 
 export default formatCurrency;
