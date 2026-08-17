@@ -1,56 +1,81 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-const ThemeContext = createContext(undefined);
+const ThemeContext = createContext(null);
 const STORAGE_KEY = "budget-tracker-theme";
+const THEMES = {
+  LIGHT: "light",
+  DARK: "dark",
+};
 
-/**
- * Provides `theme` ("light" | "dark") and `toggleTheme` to the whole
- * application via Context, so no component needs theme passed down
- * as a prop. Persists the choice to localStorage and applies it as a
- * `data-theme` attribute on <html> so plain CSS can react to it too.
- */
-export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved === "light" || saved === "dark") return saved;
-      // Respect system preference on first visit
-      if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) {
-        return "dark";
-      }
-    } catch {
-      // localStorage might be unavailable (private mode, etc.) — fall back
+function getInitialTheme() {
+  try {
+    const savedTheme = localStorage.getItem(STORAGE_KEY);
+
+    if (savedTheme === THEMES.LIGHT || savedTheme === THEMES.DARK) {
+      return savedTheme;
     }
-    return "light";
-  });
+
+    // Use the device preference when the user has not selected a theme yet.
+    if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) {
+      return THEMES.DARK;
+    }
+  } catch {
+    // Keep the default theme if browser storage is unavailable.
+  }
+
+  return THEMES.LIGHT;
+}
+
+export function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState(getInitialTheme);
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
+    const root = document.documentElement;
+
+    // CSS reads this attribute to switch the application's color variables.
+    root.setAttribute("data-theme", theme);
+
     try {
       localStorage.setItem(STORAGE_KEY, theme);
     } catch {
-      // ignore write failures, theme still works for this session
+      // The theme still works even if the preference cannot be saved.
     }
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  };
+  const toggleTheme = useCallback(() => {
+    setTheme((currentTheme) =>
+      currentTheme === THEMES.DARK ? THEMES.LIGHT : THEMES.DARK
+    );
+  }, []);
 
-  // Memoized so components consuming only `toggleTheme` (via context)
-  // don't get a brand-new function/object identity on every render
-  // of ThemeProvider unless theme actually changed.
-  const value = useMemo(() => ({ theme, toggleTheme }), [theme]);
+  const value = useMemo(
+    () => ({
+      theme,
+      toggleTheme,
+    }),
+    [theme, toggleTheme]
+  );
 
   return (
-    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>
+      {children}
+    </ThemeContext.Provider>
   );
 }
 
 export function useTheme() {
-  const ctx = useContext(ThemeContext);
-  if (ctx === undefined) {
-    throw new Error("useTheme must be used within a ThemeProvider");
+  const context = useContext(ThemeContext);
+
+  if (!context) {
+    throw new Error("useTheme must be used inside ThemeProvider");
   }
-  return ctx;
+
+  return context;
 }
