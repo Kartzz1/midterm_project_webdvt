@@ -3,23 +3,17 @@ import {
   PiBusBold,
   PiDotsThreeCircleBold,
   PiFilmSlateBold,
+  PiForkKnifeBold,
   PiGiftBold,
   PiGraduationCapBold,
   PiHeartbeatBold,
-  PiForkKnifeBold,
   PiLaptopBold,
   PiPlusCircleBold,
   PiReceiptBold,
   PiShoppingBagBold,
 } from "react-icons/pi";
 
-/**
- * One icon per category so the transaction list reads at a glance
- * (Food ≠ Bills ≠ Transportation), instead of every card sharing the
- * same generic glyph.
- */
 const CATEGORY_ICONS = {
-  // Expense categories
   Food: PiForkKnifeBold,
   Transportation: PiBusBold,
   Bills: PiReceiptBold,
@@ -28,7 +22,7 @@ const CATEGORY_ICONS = {
   Entertainment: PiFilmSlateBold,
   Health: PiHeartbeatBold,
   Other: PiDotsThreeCircleBold,
-  // Income categories
+
   Salary: PiBriefcaseBold,
   Allowance: PiGiftBold,
   Freelance: PiLaptopBold,
@@ -37,8 +31,10 @@ const CATEGORY_ICONS = {
 
 const FALLBACK_ICON = PiDotsThreeCircleBold;
 
+// Return the category icon when one exists; otherwise use a neutral icon
+// so an unknown category never causes the transaction card to break.
 export function getCategoryIcon(category) {
-  return CATEGORY_ICONS[category] || FALLBACK_ICON;
+  return CATEGORY_ICONS[category] ?? FALLBACK_ICON;
 }
 
 export default getCategoryIcon;
