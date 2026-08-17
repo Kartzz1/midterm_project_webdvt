@@ -3,40 +3,47 @@ import { useCallback, useEffect, useState } from "react";
 const STORAGE_KEY = "budget-tracker-monthly-goal";
 const DEFAULT_GOAL = 10000;
 
-function readGoal() {
+function getStoredGoal() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const parsed = Number(raw);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_GOAL;
+    const storedValue = localStorage.getItem(STORAGE_KEY);
+    const goal = Number(storedValue);
+
+    if (Number.isFinite(goal) && goal > 0) {
+      return goal;
+    }
   } catch {
-    return DEFAULT_GOAL;
+    // Use the default when browser storage cannot be accessed.
   }
+
+  return DEFAULT_GOAL;
 }
 
-/**
- * Persists the user's monthly spending limit to localStorage, mirroring
- * the pattern used by useTransactions — one hook owns the read/write
- * logic so the Summary page doesn't touch localStorage directly.
- */
 export function useMonthlyGoal() {
-  const [goal, setGoalState] = useState(readGoal);
+  const [goal, setGoal] = useState(getStoredGoal);
 
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, String(goal));
     } catch {
-      // Non-fatal — goal just won't persist across refreshes this session.
+      // The current goal remains available even if it cannot be saved.
     }
   }, [goal]);
 
-  const setGoal = useCallback((value) => {
-    const numeric = Number(value);
-    if (Number.isFinite(numeric) && numeric > 0) {
-      setGoalState(numeric);
+  const updateGoal = useCallback((value) => {
+    const nextGoal = Number(value);
+
+    // Ignore empty, invalid, zero, or negative values.
+    if (!Number.isFinite(nextGoal) || nextGoal <= 0) {
+      return;
     }
+
+    setGoal(nextGoal);
   }, []);
 
-  return { goal, setGoal };
+  return {
+    goal,
+    setGoal: updateGoal,
+  };
 }
 
 export default useMonthlyGoal;
