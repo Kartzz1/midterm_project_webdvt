@@ -4,68 +4,78 @@ import sampleTransactions from "../data/sampleTransactions";
 
 const STORAGE_KEY = "budget-tracker-transactions";
 
-function readFromStorage() {
+function readTransactions() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    // Guard against corrupted/unexpected localStorage content so a bad
-    // value can never crash the app — we just treat it as "no data".
-    if (!Array.isArray(parsed)) return null;
-    return parsed;
+    const storedData = localStorage.getItem(STORAGE_KEY);
+
+    if (!storedData) {
+      return null;
+    }
+
+    const transactions = JSON.parse(storedData);
+
+    // Only accept an array so invalid storage data cannot break the app.
+    return Array.isArray(transactions) ? transactions : null;
   } catch {
     return null;
   }
 }
 
-function writeToStorage(transactions) {
+function saveTransactions(transactions) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
   } catch {
-    // Storage might be full or unavailable — the app still works for
-    // the current session, it just won't persist across refreshes.
+    // Keep the current state working even when browser storage is unavailable.
   }
 }
 
-/**
- * Single source of truth for reading, adding, updating, deleting, and
- * persisting transactions. Every page uses this hook instead of talking
- * to localStorage directly, so persistence logic lives in exactly one
- * place.
- */
-export function useTransactions() {
-  const [transactions, setTransactions] = useState(() => {
-    const saved = readFromStorage();
-    if (saved) return saved;
-    // First-ever run: seed with sample data so the UI isn't empty,
-    // and persist that seed immediately.
-    writeToStorage(sampleTransactions);
-    return sampleTransactions;
-  });
+function getInitialTransactions() {
+  const savedTransactions = readTransactions();
 
-  // Keep storage in sync whenever transactions change.
+  if (savedTransactions) {
+    return savedTransactions;
+  }
+
+  saveTransactions(sampleTransactions);
+  return sampleTransactions;
+}
+
+export function useTransactions() {
+  const [transactions, setTransactions] = useState(getInitialTransactions);
+
   useEffect(() => {
-    writeToStorage(transactions);
+    saveTransactions(transactions);
   }, [transactions]);
 
   const addTransaction = useCallback((transaction) => {
-    const newTransaction = { ...transaction, id: uuidv4() };
-    setTransactions((prev) => [newTransaction, ...prev]);
+    const newTransaction = {
+      ...transaction,
+      id: uuidv4(),
+    };
+
+    setTransactions((current) => [newTransaction, ...current]);
+
     return newTransaction;
   }, []);
 
   const updateTransaction = useCallback((id, updates) => {
-    setTransactions((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, ...updates, id } : t))
+    setTransactions((current) =>
+      current.map((transaction) =>
+        transaction.id === id
+          ? { ...transaction, ...updates, id }
+          : transaction
+      )
     );
   }, []);
 
   const deleteTransaction = useCallback((id) => {
-    setTransactions((prev) => prev.filter((t) => t.id !== id));
+    setTransactions((current) =>
+      current.filter((transaction) => transaction.id !== id)
+    );
   }, []);
 
   const getTransactionById = useCallback(
-    (id) => transactions.find((t) => t.id === id),
+    (id) => transactions.find((transaction) => transaction.id === id),
     [transactions]
   );
 
