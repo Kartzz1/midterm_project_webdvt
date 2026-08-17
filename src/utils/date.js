@@ -1,20 +1,27 @@
 import moment from "moment";
 
-/** Formats an ISO date string for display, e.g. "Aug 9, 2026" */
+const DISPLAY_FORMAT = "MMM D, YYYY";
+const ISO_FORMAT = "YYYY-MM-DD";
+
+function parseTransactionDate(value) {
+  if (!value) return null;
+
+  const date = moment(value, ISO_FORMAT, true);
+  return date.isValid() ? date : null;
+}
+
 export function formatDate(dateString) {
-  if (!dateString) return "—";
-  const m = moment(dateString);
-  return m.isValid() ? m.format("MMM D, YYYY") : "Invalid date";
+  const date = parseTransactionDate(dateString);
+
+  return date ? date.format(DISPLAY_FORMAT) : "Invalid date";
 }
 
-/** Returns today's date as an ISO date string (YYYY-MM-DD), for form defaults */
 export function todayISO() {
-  return moment().format("YYYY-MM-DD");
+  return moment().format(ISO_FORMAT);
 }
 
-/** Relative time, e.g. "3 days ago" — used for small contextual hints */
 export function formatRelative(dateString) {
-  if (!dateString) return "";
-  const m = moment(dateString);
-  return m.isValid() ? m.fromNow() : "";
+  const date = parseTransactionDate(dateString);
+
+  return date ? date.fromNow() : "";
 }
