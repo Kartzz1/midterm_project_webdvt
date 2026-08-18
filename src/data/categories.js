@@ -21,7 +21,7 @@ export const EXPENSE_CATEGORIES = [
   "Other",
 ];
 
-/** Returns the right category list based on the selected transaction type. */
+// Gets the categories that match the transaction type.
 export function getCategoriesForType(type) {
   return type === TRANSACTION_TYPES.INCOME
     ? INCOME_CATEGORIES
