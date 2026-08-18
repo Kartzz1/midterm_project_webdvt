@@ -3,11 +3,12 @@ import TransactionForm from "../components/TransactionForm";
 import { useTransactions } from "../hooks/useTransactions";
 
 function AddTransaction() {
-  const { addTransaction } = useTransactions();
   const navigate = useNavigate();
+  const { addTransaction } = useTransactions();
 
-  const handleSubmit = (data) => {
-    addTransaction(data);
+  // Save the form data first, then return to the dashboard.
+  const handleSubmit = (transaction) => {
+    addTransaction(transaction);
     navigate("/");
   };
 
