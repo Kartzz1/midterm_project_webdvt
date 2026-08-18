@@ -7,33 +7,51 @@ import ThemeToggle from "../components/ThemeToggle";
 import { useMonthlyGoal } from "../hooks/useMonthlyGoal";
 import { useTransactions } from "../hooks/useTransactions";
 
+function getSpendingSummary(transactions) {
+  const expenses = transactions.filter(
+    (transaction) => transaction.type === "expense"
+  );
+
+  const totalExpenses = expenses.reduce(
+    (total, transaction) => total + Number(transaction.amount),
+    0
+  );
+
+  const categoryTotals = expenses.reduce((totals, transaction) => {
+    const category = transaction.category;
+    const amount = Number(transaction.amount);
+
+    totals[category] = (totals[category] || 0) + amount;
+
+    return totals;
+  }, {});
+
+  const breakdown = Object.entries(categoryTotals)
+    .map(([category, total]) => ({
+      category,
+      total,
+      percent: totalExpenses > 0
+        ? (total / totalExpenses) * 100
+        : 0,
+    }))
+    .sort((a, b) => b.total - a.total);
+
+  // The first item is the category with the highest spending.
+  return {
+    totalExpenses,
+    breakdown,
+    topCategory: breakdown[0] || null,
+  };
+}
+
 function Summary() {
   const { transactions } = useTransactions();
   const { goal, setGoal } = useMonthlyGoal();
 
-  const { totalExpenses, breakdown, topCategory } = useMemo(() => {
-    const expenseTransactions = transactions.filter((t) => t.type === "expense");
-    const total = expenseTransactions.reduce((sum, t) => sum + Number(t.amount), 0);
-
-    const totalsByCategory = expenseTransactions.reduce((acc, t) => {
-      acc[t.category] = (acc[t.category] || 0) + Number(t.amount);
-      return acc;
-    }, {});
-
-    const breakdownArr = Object.entries(totalsByCategory)
-      .map(([category, catTotal]) => ({
-        category,
-        total: catTotal,
-        percent: total > 0 ? (catTotal / total) * 100 : 0,
-      }))
-      .sort((a, b) => b.total - a.total);
-
-    return {
-      totalExpenses: total,
-      breakdown: breakdownArr,
-      topCategory: breakdownArr[0] || null,
-    };
-  }, [transactions]);
+  const { totalExpenses, breakdown, topCategory } = useMemo(
+    () => getSpendingSummary(transactions),
+    [transactions]
+  );
 
   return (
     <div className="page-container">
@@ -45,8 +63,11 @@ function Summary() {
             Understand your spending habits at a glance.
           </p>
         </div>
+
         <div className="glass glass-panel-sm appearance-pill d-flex align-items-center gap-3 flex-shrink-0">
-          <span className="small text-secondary-soft fw-semibold">Appearance</span>
+          <span className="small text-secondary-soft fw-semibold">
+            Appearance
+          </span>
           <ThemeToggle />
         </div>
       </div>
@@ -61,8 +82,13 @@ function Summary() {
         <Col xs={12} lg={7}>
           <CategoryBreakdown breakdown={breakdown} />
         </Col>
+
         <Col xs={12} lg={5}>
-          <MonthlyGoalCard goal={goal} totalExpenses={totalExpenses} onUpdateGoal={setGoal} />
+          <MonthlyGoalCard
+            goal={goal}
+            totalExpenses={totalExpenses}
+            onUpdateGoal={setGoal}
+          />
         </Col>
       </Row>
     </div>
