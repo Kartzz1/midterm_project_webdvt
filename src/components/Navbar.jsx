@@ -49,15 +49,16 @@ function AppNavbar() {
           id="main-navbar-nav"
           className="order-lg-2"
         >
-          <Nav
-            className="ms-lg-3 my-2 my-lg-0"
-            onSelect={closeMenu}
-          >
+          {/* FIX: removed onSelect from Nav — it was letting Bootstrap
+              track its own "active" item (via eventKey) independently
+              of the real URL. Now closeMenu fires per-link via onClick
+              instead, so only NavLink's route match decides active state. */}
+          <Nav className="ms-lg-3 my-2 my-lg-0">
             <Nav.Link
               as={NavLink}
               to="/"
               end
-              eventKey="/"
+              onClick={closeMenu}
             >
               Dashboard
             </Nav.Link>
@@ -65,7 +66,7 @@ function AppNavbar() {
             <Nav.Link
               as={NavLink}
               to="/add"
-              eventKey="/add"
+              onClick={closeMenu}
             >
               Add Transaction
             </Nav.Link>
@@ -73,7 +74,7 @@ function AppNavbar() {
             <Nav.Link
               as={NavLink}
               to="/transaction"
-              eventKey="/transaction"
+              onClick={closeMenu}
             >
               Transaction Details
             </Nav.Link>
@@ -81,7 +82,7 @@ function AppNavbar() {
             <Nav.Link
               as={NavLink}
               to="/summary"
-              eventKey="/summary"
+              onClick={closeMenu}
             >
               Summary
             </Nav.Link>
